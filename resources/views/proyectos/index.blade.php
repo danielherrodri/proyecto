@@ -5,8 +5,14 @@
     <div class="col-md-12">
         <h1>Proyectos</h1>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
         <a class="btn btn-success" href="{{ route('proyectos.create') }}">Nuevo proyecto</a>
+    </div>
+    <div class="col-md-6">
+        <form class="d-flex flex-row" method="get" action="{{route('proyecto.search')}}">
+            <input type="text" class="form-control" name="q" id="q" required>
+            <button type="submit" class="btn btn-success">Buscar</button>
+        </form>
     </div>
 </div>
 
@@ -35,6 +41,8 @@
                     <td>{{$proyecto->descripcion}}</td>
                     <td>{{$proyecto->tipo_proyecto}}</td>
                     <td>{{$proyecto->estado}}</td>
+                    <td><a href="{{route('proyectos.edit', $proyecto->id)}}">
+                            <button type="button" class="btn btn-danger">Editar</button></a></td>
                     <td><a href="{{route('proyectos.destroy', $proyecto->id)}}">
                             <button type="button" class="btn btn-danger">Eliminar</button></a></td>
                 </tr>

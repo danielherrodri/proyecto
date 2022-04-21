@@ -84,9 +84,10 @@ class ProyectoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Proyecto $proyecto)
     {
-        //
+        $tipoProyectos = Tipo_Proyecto::where('status', true)->orderBy('nombre', 'ASC')->get();
+        return view('proyectos.edit', compact('tipoProyectos', 'proyecto'));
     }
 
     /**
@@ -96,9 +97,18 @@ class ProyectoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Proyecto $proyecto)
     {
-        //
+        $data = $request->validate([
+            'nombre' => 'required|string|min:5',
+            'tipo_proyecto' => 'required|integer|exists:App\Models\Tipo_Proyecto,id',
+            'descripcion' => 'required|string'
+        ]);
+        $proyecto->nombre = $data['nombre'];
+        $proyecto->descripcion = $data['descripcion'];
+        $proyecto->proyecto_id = $data['tipo_proyecto'];
+        $proyecto->save();
+        return redirect()->route('proyectos.index')->with('status', 'Se actualizó correctamente');
     }
 
     /**
@@ -112,5 +122,24 @@ class ProyectoController extends Controller
         $proyecto = Proyecto::where('id', $id)->delete();
 
         return redirect()->route('proyectos.index')->with('status', 'Se eliminó correctamente');
+    }
+
+    public function search(Request $request)
+    {
+        $busqueda = $request->input('q');
+        $busqueda = trim($busqueda);
+
+        $proyectos = Proyecto::select('proyectos.*')
+            ->join('tipo_proyecto', 'tipo_proyecto.id', '=', 'proyectos.proyecto_id')
+            ->join('estatus', 'estatus.id', '=', 'proyectos.estatus_id')
+            ->where(function ($q) use ($busqueda) {
+                $q->Where('estatus.nombre', 'LIKE', "%$busqueda%")
+                    ->orWhere('proyectos.nombre', 'LIKE', "%$busqueda%")
+                    ->orWhere('tipo_proyecto.nombre', 'LIKE', "%$busqueda%")
+                    ->orWhere('estatus.nombre', 'LIKE', "%$busqueda%");
+            })
+            ->with('estatus', 'tipoProyecto')
+            ->paginate(env('APP_PAGINATE'));
+        return view('proyectos.index', compact('proyectos'));
     }
 }

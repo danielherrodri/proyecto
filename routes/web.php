@@ -24,6 +24,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/proyectos/nuevo', 'App\Http\Controllers\ProyectoController@create')->name('proyectos.create');
     Route::post('/proyectos/store', 'App\Http\Controllers\ProyectoController@store')->name('proyectos.store');
     Route::get('/proyectos/destroy/{id}', 'App\Http\Controllers\ProyectoController@destroy')->name('proyectos.destroy');
+    Route::get('/proyectos/{proyecto}/editar', 'App\Http\Controllers\ProyectoController@edit')->name('proyectos.edit');
+    Route::put('/proyectos/{proyecto}', 'App\Http\Controllers\ProyectoController@update')->name('proyectos.update')->where('proyecto', '[0-9]+');
+    Route::get('/proyectos/buscar', 'App\Http\Controllers\ProyectoController@search')->name('proyecto.search');
 });
 
 
